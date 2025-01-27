@@ -1,4 +1,4 @@
-# Nebbish
+# Nebbish ![Nebbish](res/nebbish-logo.png)
 
 A golf language. Better documentation coming soon.
 
