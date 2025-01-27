@@ -33,6 +33,12 @@ A golf language. Better documentation coming soon.
 | `s`         | Sum          |
 | `S`         | Sort         |
 
+### String
+| Instruction | Name        |
+|-------------|-------------|
+| `"`         | String mode  |
+| `` ` ``     | Command mode  |
+
 ### Loop
 | Instruction | Name         |
 |-------------|--------------|
@@ -58,6 +64,7 @@ A golf language. Better documentation coming soon.
 ### Output
 | Instruction | Name         |
 |-------------|--------------|
+| `p`         | Print        |
 | `P`         | Prettyprint  |
 
 ### Miscellaneous
