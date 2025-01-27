@@ -11,6 +11,11 @@ constant STDOUT = 1
 
 sequence cmd = command_line()
 cmd = cmd[3..$]
+
+if length(cmd) = 0 or find(cmd, {{"-h"}, {"-?"}, {"-help"}}) then
+	print_usage()
+end if
+
 sequence src = read_file(cmd[1])
 sequence stack = {}  -- data stack
 sequence shadow_realm
@@ -20,6 +25,7 @@ object y = 100 -- register 2
 object z = 1 -- register 3 (context; register I)
 integer loop_start = 1  -- flow control
 integer loop_end = length(src)
+integer string_mode = 0  -- are we pushing a string?
 
 -- parse any input from command line and push to stack
 if length(cmd) > 1 then
@@ -29,6 +35,16 @@ if length(cmd) > 1 then
 end if
 
 while i <= length(src) do
+	if string_mode then
+		if src[i] = '`' then
+			string_mode = 0
+			i += 1
+			continue
+		end if
+		stack &= src[i]
+		i += 1
+		continue
+	end if
 	switch src[i] do
 		case '0' then
 			stack &= 0
@@ -50,23 +66,23 @@ while i <= length(src) do
 			stack &= 8
 		case '9' then
 			stack &= 9
-		case '+' then
+		case '+' then  -- add
 			object sum = stack[$-1] + stack[$]
 			stack = stack[1..$-1]
 			stack[$] = sum
-		case '-' then
+		case '-' then  -- subtract
 			object diff = stack[$-1] - stack[$]
 			stack = stack[1..$-1]
 			stack[$] = diff
-		case '*' then
+		case '*' then  -- multiply
 			object prod = stack[$-1] * stack[$]
 			stack = stack[1..$-1]
 			stack[$] = prod
-		case '/' then
+		case '/' then  -- divide
 			object div = stack[$-1] / stack[$]
 			stack = stack[1..$-1]
 			stack[$] = div
-		case '^' then
+		case '^' then  -- power
 			object pow = power(stack[$-1], stack[$])
 			stack = stack[1..$-1]
 			stack[$] = pow
@@ -74,7 +90,7 @@ while i <= length(src) do
 			object rem = remainder(stack[$-1], stack[$])
 			stack = stack[1..$-1]
 			stack[$] = rem
-		case '#' then
+		case '#' then  -- join ints
 			stack[$] = join_ints(stack[$])
 		case '=' then  -- equal?
 			object eq = stack[$-1] = stack[$]
@@ -96,6 +112,8 @@ while i <= length(src) do
 			stack[$-1] = temp
 		case ';' then  -- drop
 			stack = stack[1..$-1]
+		case '"' then
+			string_mode = 1
 		case 'a' then  -- append
 			sequence appended = append(stack[$-1], stack[$])
 			stack = stack[1..$-1]
@@ -114,25 +132,28 @@ while i <= length(src) do
 			sequence concated = stack[$-1] & stack[$]
 			stack = stack[1..$-1]
 			stack[$] = concated
-		case 'd' then  -- dump state of the system to stdout
+		case 'd' then  -- dump
 			dump()
-		case 'i' then  -- push loop index
+		case 'i' then  -- context
 			stack = append(stack, z)
 		case 'I' then  -- intangibilize
 			shadow_realm = stack
 			stack = {}
-		case 'j' then  -- jump to mark
+		case 'j' then  -- jump
 			loop_end = i + 1
 			i = loop_start
 			z += 1
 			continue
 		case 'l' then  -- length
 			stack[$] = length(stack[$])
-		case 'L' then  -- stack to list
+		case 'L' then  -- listify
 			stack = append(stack, stack)
 			stack = stack[$..$]
-		case 'm' then  -- mark instruction pointer
+		case 'm' then  -- mark
 			loop_start = i
+		case 'p' then  -- print
+			puts(STDOUT, stack[$])
+			stack = stack[1..$-1]
 		case 'P' then  -- prettyprint
 			? stack[$]
 			stack = stack[1..$-1]
@@ -240,3 +261,15 @@ function parse_arg(sequence s)
 	end if
 	return s
 end function
+
+procedure print_usage()
+	puts(STDOUT, "+------------------------------+\n")
+	puts(STDOUT, "| Nebbish language interpreter |\n")
+	puts(STDOUT, "+------------------------------+\n")
+    puts(STDOUT, "Usage: nebbish [OPTIONS] <path_to_source_file> [ARGS]...\n\n")
+    puts(STDOUT, "Options:\n")
+	puts(STDOUT, "  -g         Format for CGSE\n")
+    puts(STDOUT, "  -h         Show this help message\n")
+	puts(STDOUT, "  -s         Show output as string instead of raw sequence\n\n")
+    abort(0)
+end procedure
