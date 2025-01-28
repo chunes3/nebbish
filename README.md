@@ -4,6 +4,9 @@ A golf language. Better documentation coming soon.
 
 ![Nebbish](res/nebbish-logo.png)
 
+#### Show me some code!
+`X01m:}+ix=bj;` - A program to calculate the nth Fibonacci number.
+
 ## Commands
 
 ### Arithmetic
