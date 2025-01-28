@@ -1,23 +1,22 @@
+--- standard library imports
 include std/cmdline.e
 include std/convert.e
-include std/error.e
 include std/io.e
+include std/map.e
 include std/math.e
 include std/search.e
 include std/sort.e
 include std/text.e
 
+--- nebbish project imports
+include cmdhandler.e as cmd
+
 constant STDOUT = 1
 
-sequence cmd = command_line()
-cmd = cmd[3..$]
+cmd:handle()  -- handle parsing command line
 
-if length(cmd) = 0 or find(cmd, {{"-h"}, {"-?"}, {"-help"}}) then
-	print_usage()
-end if
-
-sequence src = read_file(cmd[1])
-sequence stack = {}  -- data stack
+sequence src = cmd:src  -- source code
+sequence stack = cmd:input  -- data stack initialized w/ command line args
 sequence shadow_realm
 integer i = 1  -- instruction pointer
 object x = 25 -- register 1
@@ -27,16 +26,9 @@ integer loop_start = 1  -- flow control
 integer loop_end = length(src)
 integer string_mode = 0  -- are we pushing a string?
 
--- parse any input from command line and push to stack
-if length(cmd) > 1 then
-	for j = 2 to length(cmd) do
-		stack = append(stack, parse_arg(cmd[j]))
-	end for
-end if
-
 while i <= length(src) do
 	if string_mode then
-		if src[i] = '`' then
+		if src[i] = '`' then  -- command mode
 			string_mode = 0
 			i += 1
 			continue
@@ -46,7 +38,7 @@ while i <= length(src) do
 		continue
 	end if
 	switch src[i] do
-		case '0' then
+		case '0' then  -- push single digits as integers
 			stack &= 0
 		case '1' then
 			stack &= 1
@@ -112,7 +104,7 @@ while i <= length(src) do
 			stack[$-1] = temp
 		case ';' then  -- drop
 			stack = stack[1..$-1]
-		case '"' then
+		case '"' then  -- string mode
 			string_mode = 1
 		case 'a' then  -- append
 			sequence appended = append(stack[$-1], stack[$])
@@ -174,18 +166,27 @@ while i <= length(src) do
 			y = stack[$]
 			stack = stack[1..$-1]
 		case else
-			crash("Unrecognized character -- '" & src[i] & "'")
+			puts(STDOUT, "\n[ERROR] Unrecognized character '" & src[i] & "'\n")
+			puts(STDOUT, "at command number " & sprint(i) & "\n")
+			abort(1)
 	end switch
 	i += 1  -- increment instruction pointer
 end while
 
 -- once program is complete,
 -- print stack contents, one object per line
-for j = 1 to length(stack) do
-	? stack[j]
-end for
+if map:get(cmd:options, "-s") = 0 then
+	for j = 1 to length(stack) do
+		? stack[j]
+	end for
+else
+	for j = 1 to length(stack) do
+		puts(STDOUT, stack[j])
+	end for
+end if
 
--- ----------------------
+---------------------------
+
 procedure dump()
 	puts(STDOUT, "Registers ---\n")
 	puts(STDOUT, "X: " & sprint(x) & "  ")
@@ -205,71 +206,3 @@ function join_ints(sequence ints)
 	end for
 	return to_integer(result)
 end function
-
-function find_matching_brace(sequence s, integer start_index)
-    integer open_braces = 0
-    for i = start_index to length(s) do
-        if s[i] = '{' then
-            open_braces += 1
-        elsif s[i] = '}' then
-            open_braces -= 1
-            if open_braces = 0 then
-                return i
-            end if
-        end if
-    end for
-    return 0 -- return 0 if no matching brace is found
-end function
-
-function parse_seq(sequence s)
-    sequence result = {}
-    integer index = 1
-    while index <= length(s) do
-        if s[index] = '{' then
-            integer closing_brace = find_matching_brace(s, index)
-            sequence inner_seq = parse_seq(s[index + 1 .. closing_brace - 1])
-            result = append(result, inner_seq)
-            index = closing_brace + 1
-        elsif s[index] >= '0' and s[index] <= '9' then
-            integer next_comma = match(",", s, index)
-            if next_comma = 0 then
-                result = append(result, to_number(s[index .. $]))
-                exit
-            else
-                result = append(result, to_number(s[index .. next_comma - 1]))
-                index = next_comma + 1
-            end if
-        else
-            index += 1
-        end if
-    end while
-    return result
-end function
-
-function parse_sequence(sequence s)
-	sequence result = parse_seq(s)
-	return result[1]
-end function
-
-function parse_arg(sequence s)
-	if s[1] = '{' then
-		return parse_sequence(s)
-	end if
-	object result = to_number(s, -1)
-	if atom(result) then
-		return result
-	end if
-	return s
-end function
-
-procedure print_usage()
-	puts(STDOUT, "+------------------------------+\n")
-	puts(STDOUT, "| Nebbish language interpreter |\n")
-	puts(STDOUT, "+------------------------------+\n")
-    puts(STDOUT, "Usage: nebbish [OPTIONS] <path_to_source_file> [ARGS]...\n\n")
-    puts(STDOUT, "Options:\n")
-	puts(STDOUT, "  -g         Format for CGSE\n")
-    puts(STDOUT, "  -h         Show this help message\n")
-	puts(STDOUT, "  -s         Show output as string instead of raw sequence\n\n")
-    abort(0)
-end procedure
