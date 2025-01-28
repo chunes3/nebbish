@@ -4,7 +4,7 @@ A golf language. Better documentation coming soon.
 
 ![Nebbish](res/nebbish-logo.png)
 
-## Nebbish Commands
+## Commands
 
 ### Arithmetic
 | Instruction | Name        |
