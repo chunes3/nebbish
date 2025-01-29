@@ -1,11 +1,9 @@
 # Nebbish
+<img src="res/nebbish-logo.png" width="150" height="100">
 
-A golf language. Better documentation coming soon.
+> `X01m:}+ix=bj;` A program to calculate the nth Fibonacci number.
 
-![Nebbish](res/nebbish-logo.png)
-
-#### Show me some code!
-`X01m:}+ix=bj;` - A program to calculate the nth Fibonacci number.
+## Characteristics
 
 ## Commands
 
@@ -27,6 +25,8 @@ A golf language. Better documentation coming soon.
 | `;`         | Drop         |
 | `I`         | Intangibilize|
 | `T`         | Tangibilize  |
+| `}`         | Bury          |
+| `{`         | Exhume         |
 
 ### List
 | Instruction | Name         |
@@ -61,9 +61,9 @@ A golf language. Better documentation coming soon.
 ### Register
 | Instruction | Name         |
 |-------------|--------------|
-| `x`         | Copy X       |
+| `x`         | Copy from X       |
 | `X`         | Move to X    |
-| `y`         | Copy Y       |
+| `y`         | Copy from Y       |
 | `Y`         | Move to Y    |
 
 ### Output
