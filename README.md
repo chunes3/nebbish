@@ -3,6 +3,8 @@
 
 > `X01[:}+ix=b];` A program to calculate the nth Fibonacci number.
 
+> `[[ij*P84*pj9=b]Ni9=b]` A program to show a times table.
+
 ## Characteristics
 
 ## Commands
