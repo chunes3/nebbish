@@ -171,8 +171,7 @@ while i <= length(src) do
 			stack = stack[1..$-1]
 		case 'r' then  -- random
 			object limit = stack[$]
-			stack = stack[1..$-1]
-			stack &= rand(limit)
+			stack[$] = rand(limit)
 		case 's' then  -- sum
 			stack[$] = sum(stack[$])
 		case 'S' then  -- sort
