@@ -1,7 +1,7 @@
 # Nebbish
 <img src="res/nebbish-logo.png" width="150" height="100">
 
-> `X01m:}+ix=bj;` A program to calculate the nth Fibonacci number.
+> `X01[:}+ix=b];` A program to calculate the nth Fibonacci number.
 
 ## Characteristics
 
