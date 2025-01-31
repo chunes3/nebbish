@@ -7,7 +7,7 @@
 
 ## Characteristics
 
-Nebbish is a stack-based golf language that uses one printable ASCII character per command. Unlike say, a language like [Vyxal](https://github.com/Vyxal/Vyxal), Nebbish aims to provide a modest set of primitives that ideally combine to tackle golf-type problems ergonomically. The primary goal of the language is to be fun to write, with terseness as a secondary goal.
+Nebbish is a stack-based golf language that uses one printable ASCII character per command. Unlike say, a language like [Vyxal](https://github.com/Vyxal/Vyxal), with a command for everything, Nebbish aims to provide a modest set of primitives that combine to tackle golf-type problems orthagonally. The primary goal of the language is to make terse procedural code fun to write. Terseness itself is a secondary goal.
 
 ## Commands
 
