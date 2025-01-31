@@ -47,9 +47,12 @@
 ### Loop
 | Instruction | Name         |
 |-------------|--------------|
-| `m`         | Mark         |
-| `j`         | Jump         |
+| `[`         | Start loop         |
+| `]`         | End loop         |
 | `b`         | Break if     |
+| `i`         | iteration index      |
+| `j`         | deeper iteration index      |
+| `k`         | deepest iteration index      |
 
 ### Comparison
 | Instruction | Name         |
@@ -71,12 +74,12 @@
 |-------------|--------------|
 | `p`         | Print        |
 | `P`         | Prettyprint  |
+| `N`         | Output newline |
 
 ### Miscellaneous
 | Instruction | Name         |
 |-------------|--------------|
 | `d`         | Dump         |
 | `#`         | Join Ints    |
-| `i`         | Context      |
 
 More to come soon!
