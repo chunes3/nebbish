@@ -5,6 +5,7 @@ include std/io.e
 include std/map.e
 include std/math.e
 include std/search.e
+include std/sequence.e
 include std/sort.e
 include std/text.e
 
@@ -17,13 +18,12 @@ cmd:handle()  -- handle parsing command line
 
 sequence src = cmd:src  -- source code
 sequence stack = cmd:input  -- data stack initialized w/ command line args
-sequence shadow_realm
+sequence return_stack = {}  -- start indices for nested loops
+sequence shadow_realm  -- for temporary shadowing of the data stack
 integer i = 1  -- instruction pointer
 object x = 25 -- register 1
 object y = 100 -- register 2
-object z = 1 -- register 3 (context; register I)
-integer loop_start = 1  -- flow control
-integer loop_end = length(src)
+sequence context_stack = {}  -- keep track of nested context (register I)
 integer string_mode = 0  -- are we pushing a string?
 
 while i <= length(src) do
@@ -102,10 +102,21 @@ while i <= length(src) do
 			object temp = stack[$]
 			stack[$] = stack[$-1]
 			stack[$-1] = temp
+		case '}' then  -- bury
+			stack = rotate(stack, ROTATE_RIGHT)
+		case '{' then  -- exhume
+			stack = rotate(stack, ROTATE_LEFT)
 		case ';' then  -- drop
 			stack = stack[1..$-1]
 		case '"' then  -- string mode
 			string_mode = 1
+		case '[' then  -- loop
+			return_stack &= i + 1
+			context_stack &= 1
+		case ']' then  -- end loop
+			i = return_stack[$]
+			context_stack[$] += 1
+			continue
 		case 'a' then  -- append
 			sequence appended = append(stack[$-1], stack[$])
 			stack = stack[1..$-1]
@@ -114,11 +125,21 @@ while i <= length(src) do
 			object flag = stack[$]
 			stack = stack[1..$-1]
 			if flag then
-				i = loop_end
-				loop_start = 1
-				loop_end = length(src)
-				z = 1
-				continue
+				sequence brackets = {}
+				while 1 do
+					if src[i] = '[' then
+						brackets &= '['
+					elsif src[i] = ']' then
+						if length(brackets) > 1 then
+							brackets = brackets[1..$-1]
+						else
+							exit
+						end if
+					end if
+					i += 1
+				end while
+				return_stack = return_stack[1..$-1]
+				context_stack = context_stack[1..$-1]
 			end if
 		case 'c' then  -- concat
 			sequence concated = stack[$-1] & stack[$]
@@ -127,27 +148,26 @@ while i <= length(src) do
 		case 'd' then  -- dump
 			dump()
 		case 'i' then  -- context
-			stack = append(stack, z)
+			stack = append(stack, context_stack[1])
 		case 'I' then  -- intangibilize
 			shadow_realm = stack
 			stack = {}
-		case 'j' then  -- jump
-			loop_end = i + 1
-			i = loop_start
-			z += 1
-			continue
+		case 'j' then  -- deeper context
+			stack = append(stack, context_stack[2])
+		case 'k' then  -- deepest context
+			stack = append(stack, context_stack[$])
 		case 'l' then  -- length
 			stack[$] = length(stack[$])
 		case 'L' then  -- listify
 			stack = append(stack, stack)
 			stack = stack[$..$]
-		case 'm' then  -- mark
-			loop_start = i
+		case 'N' then  -- output newline
+			puts(STDOUT, "\n")
 		case 'p' then  -- print
 			puts(STDOUT, stack[$])
 			stack = stack[1..$-1]
 		case 'P' then  -- prettyprint
-			? stack[$]
+			print(STDOUT, stack[$])
 			stack = stack[1..$-1]
 		case 's' then  -- sum
 			stack[$] = sum(stack[$])
@@ -190,8 +210,13 @@ end if
 procedure dump()
 	puts(STDOUT, "Registers ---\n")
 	puts(STDOUT, "X: " & sprint(x) & "  ")
-	puts(STDOUT, "Y: " & sprint(y) & "  ")
-	puts(STDOUT, "I: " & sprint(z) & "\n")
+	puts(STDOUT, "Y: " & sprint(y) & "\n")
+	puts(STDOUT, "Return stack ---\n")
+	for j = 1 to length(return_stack) do
+		print(STDOUT, return_stack[j])
+		puts(STDOUT, " ")
+	end for
+	puts(STDOUT, "\n")
 	puts(STDOUT, "Data stack ---\n")
 	for j = 1 to length(stack) do
 		? stack[j]
