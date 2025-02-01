@@ -102,6 +102,8 @@ while i <= length(src) do
 			object temp = stack[$]
 			stack[$] = stack[$-1]
 			stack[$-1] = temp
+		case ',' then  -- over
+			stack = append(stack, stack[$-1])
 		case '}' then  -- bury
 			stack = rotate(stack, ROTATE_RIGHT)
 		case '{' then  -- exhume
