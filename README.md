@@ -24,7 +24,7 @@ Nebbish is a stack-based golf language that uses one printable ASCII character p
 ### Arithmetic
 | Instruction | Name        | Signature | Examples |
 |-------------|-------------|------------|--------|
-| `+`         | Add         | `obj obj -- obj` | `11+  \ 2`  `123L2+  \ {3,4,5}` |
+| `+`         | Add         | `obj obj -- obj` | `11+ \ 2` <br> `123L2+ \ {3,4,5}` <br> `123LI456LT+ \ {5,7,9}` |
 | `-`         | Subtract    | `obj obj -- obj` |
 | `*`         | Multiply    | `obj obj -- obj` |
 | `/`         | Divide      | `obj obj -- obj` |
