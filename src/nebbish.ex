@@ -147,6 +147,8 @@ while i <= length(src) do
 			stack[$] = concated
 		case 'd' then  -- dump
 			dump()
+		case 'f' then  -- floor
+			stack[$] = floor(stack[$])
 		case 'i' then  -- context
 			stack = append(stack, context_stack[1])
 		case 'I' then  -- intangibilize
