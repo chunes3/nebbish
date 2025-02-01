@@ -20,6 +20,7 @@ Nebbish is a stack-based golf language that uses one printable ASCII character p
 | `/`         | Divide      |
 | `^`         | Power       |
 | `%`         | Mod         |
+| `f`         | Floor       |
 
 ### Stack
 | Instruction | Name         |
