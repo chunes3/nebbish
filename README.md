@@ -37,6 +37,7 @@ Nebbish is a stack-based golf language that uses one printable ASCII character p
 |-------------|--------------|
 | `:`         | Dup          |
 | `~`         | Swap         |
+| `,`         | Over         |
 | `;`         | Drop         |
 | `I`         | Intangibilize|
 | `T`         | Tangibilize  |
