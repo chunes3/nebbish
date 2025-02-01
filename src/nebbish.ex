@@ -117,6 +117,19 @@ while i <= length(src) do
 			i = return_stack[$]
 			context_stack[$] += 1
 			continue
+		case '\\' then  -- comment
+			while src[i] != '\n' and i < length(src) do
+				i += 1
+			end while
+		case '\n' then  -- ignore whitespace
+			fallthru
+		case '\t' then
+			fallthru
+		case ' ' then
+			fallthru
+		case '\r' then
+			i += 1
+			continue
 		case 'a' then  -- append
 			sequence appended = append(stack[$-1], stack[$])
 			stack = stack[1..$-1]
